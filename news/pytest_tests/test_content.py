@@ -1,0 +1,76 @@
+import pytest
+
+from news.models import Comment
+from datetime import timedelta
+
+from django.conf import settings
+from django.urls import reverse
+from django.utils import timezone
+
+
+from news.forms import CommentForm
+
+
+@pytest.mark.django_db
+def test_news_count(many_news):
+    """
+        Тестируем кол-во новостей на главной странице
+    """
+    object_list = many_news
+    news_count = object_list.count()
+    assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
+
+
+@pytest.mark.django_db
+def test_news_order(many_news):
+    """
+    Тестируем сортировку новостей от старых к новым
+    """
+    object_list = many_news
+    all_dates = [news.date for news in object_list]
+    sorted_dates = sorted(all_dates, reverse=True)
+    assert all_dates == sorted_dates
+
+
+@pytest.mark.django_db
+def test_comments_order(author_client, reader, news):
+    """
+    Тестируем сортировку комментариев от новых к старым
+    """
+    now = timezone.now()
+    for index in range(10):
+        comment = Comment.objects.create(
+            news=news,
+            author=reader,
+            text=f'Tекст {index}',
+        )
+        comment.created = now + timedelta(days=index)
+        comment.save()
+    response = author_client.get(reverse('news:detail', args=(news.id,)))
+    assert 'news' in response.context
+    news = response.context['news']
+    all_comments = news.comment_set.all()
+    all_timestamps = [comment.created for comment in all_comments]
+    sorted_timestamps = sorted(all_timestamps)
+    assert all_timestamps == sorted_timestamps
+
+
+@pytest.mark.django_db
+def test_anonymous_client_has_no_form(client, news):
+    """
+    Тестируем, что форма не доступна анониму
+    """
+    url = reverse('news:detail', args=(news.id,))
+    response = client.get(url)
+    assert 'form' not in response.context
+
+
+@pytest.mark.django_db
+def test_authorized_client_has_form(author_client, news):
+    """
+    Тестируем доступн формы для авторизованного пользователя
+    """
+    url = reverse('news:detail', args=(news.id,))
+    response = author_client.get(url)
+    assert 'form' in response.context
+    assert isinstance(response.context['form'], CommentForm)
