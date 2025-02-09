@@ -1,14 +1,12 @@
-import pytest
 from datetime import datetime, timedelta
 
+import pytest
 from django.conf import settings
 from django.urls import reverse
 from django.test.client import Client
 from django.utils import timezone
 
 from news.models import Comment, News
-
-HOME_URL = reverse('news:home')
 
 
 @pytest.fixture  # Создаем автора
@@ -37,24 +35,22 @@ def not_author_client(reader):
 
 @pytest.fixture  # Создаем новость
 def news():
-    news = News.objects.create(
+    return News.objects.create(
         title='Заголовок',
         text='Текст')
-    return news
 
 
 @pytest.fixture  # Создаем комментарий
 def comment(news, author):
-    comment = Comment.objects.create(
+    return Comment.objects.create(
         news=news,
         author=author,
         text='Текст комментария'
     )
-    return comment
 
 
 @pytest.fixture  # Создаем много новостей
-def many_news(client):
+def many_news():
     today = datetime.today()
     all_news = []
     for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
@@ -64,28 +60,34 @@ def many_news(client):
             date=today - timedelta(days=index))
         all_news.append(news)
     # Через метод bulk_create() создаем разом все записи
-    News.objects.bulk_create(all_news)
-    response = client.get(HOME_URL)
-    object_list = response.context['object_list']
-
-    return object_list
+    return News.objects.bulk_create(all_news)
 
 
 @pytest.fixture  # Создаем много комментариев
-def many_comments(news, not_author_client, client):
+def many_comments(news, author_client):
     now = timezone.now()
     for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
         comment = Comment.objects.create(
             news=news,
-            author=not_author_client,
+            author=author_client,
             text=f'Tекст {index}',
         )
         comment.created = now + timedelta(days=index)
         comment.save()
-    response = client.get(reverse('news:detail', args=(news.id,)))
-    return response
+    return comment
 
 
 @pytest.fixture
 def form_data():
     return {'text': 'Новый текст'}
+
+
+@pytest.fixture  # Описываем маршруты
+def url_fixtures():
+    return {
+        'home': 'news:home',
+        'detail': 'news:detail',
+        'login': 'users:login',
+        'logout': 'users:logout',
+        'signup': 'users:signup'
+    }

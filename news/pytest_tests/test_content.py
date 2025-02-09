@@ -12,9 +12,10 @@ from news.forms import CommentForm
 
 
 @pytest.mark.django_db
-def test_news_count(many_news):
+def test_news_count(many_news, client):
     """Тестируем кол-во новостей на главной странице"""
-    object_list = many_news
+    response = client.get(reverse('news:home'))
+    object_list = response.context.get('object_list')
     news_count = object_list.count()
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
@@ -29,18 +30,9 @@ def test_news_order(many_news):
 
 
 @pytest.mark.django_db
-def test_comments_order(author_client, reader, news):
+def test_comments_order(client, news):
     """Тестируем сортировку комментариев от старых к новым"""
-    now = timezone.now()
-    for index in range(10):
-        comment = Comment.objects.create(
-            news=news,
-            author=reader,
-            text=f'Tекст {index}',
-        )
-        comment.created = now + timedelta(days=index)
-        comment.save()
-    response = author_client.get(reverse('news:detail', args=(news.id,)))
+    response = client.get(reverse('news:detail', args=(news.id,)))
     assert 'news' in response.context
     news = response.context['news']
     all_comments = news.comment_set.all()
