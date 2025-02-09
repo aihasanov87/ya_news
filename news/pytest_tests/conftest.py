@@ -13,12 +13,12 @@ HOME_URL = reverse('news:home')
 
 @pytest.fixture  # Создаем автора
 def author(django_user_model):
-    return django_user_model.objects.create(username='Лев Толстой')
+    return django_user_model.objects.create(username='Автор')
 
 
 @pytest.fixture  # Создаем анонима
 def reader(django_user_model):
-    return django_user_model.objects.create(username='Читатель простой')
+    return django_user_model.objects.create(username='Читатель')
 
 
 @pytest.fixture  # Авторизуем автора

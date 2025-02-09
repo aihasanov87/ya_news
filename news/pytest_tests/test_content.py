@@ -24,7 +24,7 @@ def test_news_count(many_news):
 @pytest.mark.django_db
 def test_news_order(many_news):
     """
-    Тестируем сортировку новостей от старых к новым
+    Тестируем сортировку новостей от новых к старым
     """
     object_list = many_news
     all_dates = [news.date for news in object_list]
@@ -35,7 +35,7 @@ def test_news_order(many_news):
 @pytest.mark.django_db
 def test_comments_order(author_client, reader, news):
     """
-    Тестируем сортировку комментариев от новых к старым
+    Тестируем сортировку комментариев от старых к новым
     """
     now = timezone.now()
     for index in range(10):
