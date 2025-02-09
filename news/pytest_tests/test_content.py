@@ -60,8 +60,8 @@ def test_anonymous_client_has_no_form(client, news):
     """
     Тестируем, что форма не доступна анониму
     """
-    url = reverse('news:detail', args=(news.id,))
-    response = client.get(url)
+    news_url = reverse('news:detail', args=(news.id,))
+    response = client.get(news_url)
     assert 'form' not in response.context
 
 
@@ -70,7 +70,7 @@ def test_authorized_client_has_form(author_client, news):
     """
     Тестируем доступн формы для авторизованного пользователя
     """
-    url = reverse('news:detail', args=(news.id,))
-    response = author_client.get(url)
+    news_url = reverse('news:detail', args=(news.id,))
+    response = author_client.get(news_url)
     assert 'form' in response.context
     assert isinstance(response.context['form'], CommentForm)

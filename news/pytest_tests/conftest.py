@@ -85,19 +85,7 @@ def many_comments(news, not_author_client, client):
     response = client.get(reverse('news:detail', args=(news.id,)))
     return response
 
-    # author = User.objects.create(username='Комментатор')
-    # news = News.objects.create(
-    #     title='Тестовая новость', text='Просто текст.'
-    # )
-    # now = timezone.now()
-    # for index in range(10):
-    #     comment = Comment.objects.create(
-    #         news=news, author=author, text=f'Tекст {index}',
-    #     )
-    #     comment.created = now + timedelta(days=index)
-    #     comment.save()
-    # response = author_client.get(reverse('news:detail', args=(news.id,)))
-    # assert 'news' in response.context
-    # news = response.context['news']
-    # all_comments = news.comment_set.all()
-    # assert all_comments[0].created < all_comments[1].created
+
+@pytest.fixture
+def form_data():
+    return {'text': 'Новый текст'}
