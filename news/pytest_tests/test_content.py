@@ -13,9 +13,7 @@ from news.forms import CommentForm
 
 @pytest.mark.django_db
 def test_news_count(many_news):
-    """
-        Тестируем кол-во новостей на главной странице
-    """
+    """Тестируем кол-во новостей на главной странице"""
     object_list = many_news
     news_count = object_list.count()
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
@@ -23,9 +21,7 @@ def test_news_count(many_news):
 
 @pytest.mark.django_db
 def test_news_order(many_news):
-    """
-    Тестируем сортировку новостей от новых к старым
-    """
+    """Тестируем сортировку новостей от новых к старым"""
     object_list = many_news
     all_dates = [news.date for news in object_list]
     sorted_dates = sorted(all_dates, reverse=True)
@@ -34,9 +30,7 @@ def test_news_order(many_news):
 
 @pytest.mark.django_db
 def test_comments_order(author_client, reader, news):
-    """
-    Тестируем сортировку комментариев от старых к новым
-    """
+    """Тестируем сортировку комментариев от старых к новым"""
     now = timezone.now()
     for index in range(10):
         comment = Comment.objects.create(
@@ -57,9 +51,7 @@ def test_comments_order(author_client, reader, news):
 
 @pytest.mark.django_db
 def test_anonymous_client_has_no_form(client, news):
-    """
-    Тестируем, что форма не доступна анониму
-    """
+    """Тестируем, что форма не доступна анониму"""
     news_url = reverse('news:detail', args=(news.id,))
     response = client.get(news_url)
     assert 'form' not in response.context
@@ -67,9 +59,7 @@ def test_anonymous_client_has_no_form(client, news):
 
 @pytest.mark.django_db
 def test_authorized_client_has_form(author_client, news):
-    """
-    Тестируем доступн формы для авторизованного пользователя
-    """
+    """Тестируем доступн формы для авторизованного пользователя"""
     news_url = reverse('news:detail', args=(news.id,))
     response = author_client.get(news_url)
     assert 'form' in response.context

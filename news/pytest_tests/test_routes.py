@@ -17,9 +17,7 @@ from pytest_django.asserts import assertRedirects
 )
 @pytest.mark.django_db
 def test_pages_availability(client, name, args, news):
-    """
-    Тестируем доступность страниц для анонинов
-    """
+    """Тестируем доступность страниц для анонинов"""
     if args:
         url = reverse(name, args=(args.id,))
     else:
@@ -46,9 +44,7 @@ def test_pages_availability_for_different_users(
         comment,
         expected_status
 ):
-    """
-    Тестируем удаление и редактирование разными авторами
-    """
+    """Тестируем удаление и редактирование разными авторами"""
     url = reverse(name, args=(comment.id,))
     response = parametrized_client.get(url)
     assert response.status_code == expected_status
@@ -63,9 +59,7 @@ def test_pages_availability_for_different_users(
 )
 @pytest.mark.django_db
 def test_redirect_for_anonymous_client(client, name, args, comment):
-    """
-    Тестируем редиректы
-    """
+    """Тестируем редиректы"""
     login_url = reverse('users:login')
     url = reverse(name, args=(args.id,))
     expected_url = f'{login_url}?next={url}'
