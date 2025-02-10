@@ -64,17 +64,17 @@ def many_news():
 
 
 @pytest.fixture  # Создаем много комментариев
-def many_comments(news, author_client):
+def many_comments(news, author):
     now = timezone.now()
     for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1):
         comment = Comment.objects.create(
             news=news,
-            author=author_client,
+            author=author,
             text=f'Tекст {index}',
         )
         comment.created = now + timedelta(days=index)
         comment.save()
-    return comment
+    return Comment.objects.all()
 
 
 @pytest.fixture
@@ -82,12 +82,36 @@ def form_data():
     return {'text': 'Новый текст'}
 
 
-@pytest.fixture  # Описываем маршруты
-def url_fixtures():
-    return {
-        'home': 'news:home',
-        'detail': 'news:detail',
-        'login': 'users:login',
-        'logout': 'users:logout',
-        'signup': 'users:signup'
-    }
+@pytest.fixture  # Описываем маршрут home
+def url_home():
+    return 'news:home'
+
+
+@pytest.fixture  # Описываем маршрут detail
+def url_detail():
+    return 'news:detail'
+
+
+@pytest.fixture  # Описываем маршрут delete
+def url_delete():
+    return 'news:delete'
+
+
+@pytest.fixture  # Описываем маршрут edit
+def url_edit():
+    return 'news:edit'
+
+
+@pytest.fixture  # Описываем маршрут login
+def url_login():
+    return 'users:login'
+
+
+@pytest.fixture  # Описываем маршрут logout
+def url_logout():
+    return 'users:logout'
+
+
+@pytest.fixture  # Описываем маршрут signup
+def url_signup():
+    return 'users:signup'

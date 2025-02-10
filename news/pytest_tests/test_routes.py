@@ -8,11 +8,11 @@ from pytest_django.asserts import assertRedirects
 @pytest.mark.parametrize(
     'name, args',
     (
-        ('news:home', None),
-        ('news:detail', pytest.lazy_fixture('news')),
-        ('users:login', None),
-        ('users:logout', None),
-        ('users:signup', None),
+        (pytest.lazy_fixture('url_home'), None),
+        (pytest.lazy_fixture('url_detail'), pytest.lazy_fixture('news')),
+        (pytest.lazy_fixture('url_login'), None),
+        (pytest.lazy_fixture('url_logout'), None),
+        (pytest.lazy_fixture('url_signup'), None),
     )
 )
 @pytest.mark.django_db
@@ -35,7 +35,9 @@ def test_pages_availability(client, name, args, news):
 )
 @pytest.mark.parametrize(
     'name',
-    ('news:edit', 'news:delete'),
+    (pytest.lazy_fixture('url_edit'),
+     pytest.lazy_fixture('url_delete'),
+     ),
 )
 @pytest.mark.django_db
 def test_pages_availability_for_different_users(
@@ -53,14 +55,14 @@ def test_pages_availability_for_different_users(
 @pytest.mark.parametrize(
     'name, args',
     (
-        ('news:edit', pytest.lazy_fixture('comment')),
-        ('news:delete', pytest.lazy_fixture('comment')),
+        (pytest.lazy_fixture('url_edit'), pytest.lazy_fixture('comment')),
+        (pytest.lazy_fixture('url_delete'), pytest.lazy_fixture('comment')),
     )
 )
 @pytest.mark.django_db
-def test_redirect_for_anonymous_client(client, name, args, comment):
+def test_redirect_for_anonymous_client(client, name, args, comment, url_login):
     """Тестируем редиректы"""
-    login_url = reverse('users:login')
+    login_url = reverse(url_login)
     url = reverse(name, args=(args.id,))
     expected_url = f'{login_url}?next={url}'
     response = client.get(url)
