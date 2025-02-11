@@ -1,28 +1,23 @@
 import pytest
 from http import HTTPStatus
 
-from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 
 @pytest.mark.parametrize(
-    'name, args',
+    'name',
     (
-        (pytest.lazy_fixture('url_home'), None),
-        (pytest.lazy_fixture('url_detail'), pytest.lazy_fixture('news')),
-        (pytest.lazy_fixture('url_login'), None),
-        (pytest.lazy_fixture('url_logout'), None),
-        (pytest.lazy_fixture('url_signup'), None),
+        (pytest.lazy_fixture('url_home')),
+        (pytest.lazy_fixture('url_detail')),
+        (pytest.lazy_fixture('url_login')),
+        (pytest.lazy_fixture('url_logout')),
+        (pytest.lazy_fixture('url_signup')),
     )
 )
 @pytest.mark.django_db
-def test_pages_availability(client, name, args, news):
+def test_pages_availability(client, name):
     """Тестируем доступность страниц для анонинов"""
-    if args:
-        url = reverse(name, args=(args.id,))
-    else:
-        url = reverse(name)
-    response = client.get(url)
+    response = client.get(name)
     assert response.status_code == HTTPStatus.OK
 
 
@@ -43,27 +38,23 @@ def test_pages_availability(client, name, args, news):
 def test_pages_availability_for_different_users(
         parametrized_client,
         name,
-        comment,
         expected_status
 ):
     """Тестируем удаление и редактирование разными авторами"""
-    url = reverse(name, args=(comment.id,))
-    response = parametrized_client.get(url)
+    response = parametrized_client.get(name)
     assert response.status_code == expected_status
 
 
 @pytest.mark.parametrize(
-    'name, args',
+    'name',
     (
-        (pytest.lazy_fixture('url_edit'), pytest.lazy_fixture('comment')),
-        (pytest.lazy_fixture('url_delete'), pytest.lazy_fixture('comment')),
+        (pytest.lazy_fixture('url_edit')),
+        (pytest.lazy_fixture('url_delete')),
     )
 )
 @pytest.mark.django_db
-def test_redirect_for_anonymous_client(client, name, args, comment, url_login):
+def test_redirect_for_anonymous_client(client, name, url_login):
     """Тестируем редиректы"""
-    login_url = reverse(url_login)
-    url = reverse(name, args=(args.id,))
-    expected_url = f'{login_url}?next={url}'
-    response = client.get(url)
+    expected_url = f'{url_login}?next={name}'
+    response = client.get(name)
     assertRedirects(response, expected_url)
