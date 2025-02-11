@@ -9,7 +9,11 @@ from news.forms import BAD_WORDS, WARNING
 
 
 @pytest.mark.django_db
-def test_anonymous_user_cant_create_comment(client, news, form_data, url_detail):
+def test_anonymous_user_cant_create_comment(
+        client,
+        news,
+        form_data,
+        url_detail):
     """Проверяем, что аноним не может создать коммент"""
     news_url = reverse(url_detail, args=(news.id,))
     client.post(news_url, data=form_data)
