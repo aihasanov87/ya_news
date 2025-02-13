@@ -74,7 +74,6 @@ def many_comments(news, author):
         )
         comment.created = now + timedelta(days=index)
         comment.save()
-    Comment.objects.all()
 
 
 @pytest.fixture
